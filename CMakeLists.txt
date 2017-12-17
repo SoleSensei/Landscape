@@ -1,53 +1,35 @@
 cmake_minimum_required(VERSION 3.5)
-project(main)
+project(landscape)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMALE_CXX_FLAGS "-O3")
+set(DEPEN_DIR "depen")
 
-set(SOURCE_FILES
-        common.h
-        glad.c
-        main.cpp
-        Camera.h
-        Camera.cpp
-        ShaderProgram.h
-        ShaderProgram.cpp)
+file(GLOB_RECURSE glm
+    ${DEPEN_DIR}/glm/*.h
+    ${DEPEN_DIR}/glm/*.cpp
+    ${DEPEN_DIR}/glm/*.hpp
+)
 
-set(ADDITIONAL_INCLUDE_DIRS
-        dependencies/include/GLAD)
-set(ADDITIONAL_LIBRARY_DIRS
-        dependencies/lib)   
-set(ADDITIONAL_RUNTIME_LIBRARY_DIRS
-        dependencies/bin)   
+file(GLOB_RECURSE glad
+    ${DEPEN_DIR}/GLAD/*.h
+)
 
-set (CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG}")
+file(GLOB glfw
+    ${DEPEN_DIR}/GLFW/*.h
+)
 
-if(WIN32)
-  set(ADDITIONAL_INCLUDE_DIRS 
-        ${ADDITIONAL_INCLUDE_DIRS}
-        dependencies/include)
-  link_directories(${ADDITIONAL_LIBRARY_DIRS})
-else()
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-	find_package(glfw3 REQUIRED)
-  find_package(GLM REQUIRED)
-endif()
+file(GLOB sources
+    include/*.h
+    include/*.hpp
+    src/*.cpp
+    src/*.c
+)
 
-include_directories(${ADDITIONAL_INCLUDE_DIRS})
+include_directories("include"  "depen" "depen/GLAD")
 
-find_package(OpenGL REQUIRED)
+add_executable(${PROJECT_NAME} ${glm} ${glad} ${glfw} ${sources})
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 
-add_executable(main ${SOURCE_FILES})
-
-target_include_directories(main PRIVATE ${OPENGL_INCLUDE_DIR})
-add_custom_command(TARGET main POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/shaders" "${PROJECT_BINARY_DIR}")
-
-if(WIN32)
-  add_custom_command(TARGET main POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/dependencies/bin" $<TARGET_FILE_DIR:main>)
-  #set(CMAKE_MSVCIDE_RUN_PATH ${ADDITIONAL_RUNTIME_LIBRARY_DIRS})
-  target_compile_options(main PRIVATE)
-  target_link_libraries(main LINK_PUBLIC ${OPENGL_gl_LIBRARY} glfw3dll)
-else()
-  target_compile_options(main PRIVATE -Wnarrowing)
-  target_link_libraries(main LINK_PUBLIC ${OPENGL_gl_LIBRARY} glfw rt dl)
-endif()
-
+link_directories("static")
+target_link_libraries(${PROJECT_NAME} glfw pthread Xinerama Xcursor X11 Xxf86vm Xrandr Xi GL dl)

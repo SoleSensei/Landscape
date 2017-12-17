@@ -88,7 +88,7 @@ void OnMouseMove(GLFWwindow* window, double xpos, double ypos)
   }
 
   GLfloat xoffset = float(xpos) - lastX;
-  GLfloat yoffset = lastY - float(ypos);  
+  GLfloat yoffset = lastY - float(ypos);
 
   lastX = float(xpos);
   lastY = float(ypos);
@@ -149,7 +149,7 @@ static int createTriStrip(int rows, int cols, float size, GLuint &vao)
   {
     for (int x = 0; x < cols; ++x)
     {
-      //вычисляем координаты каждой из вершин 
+      //вычисляем координаты каждой из вершин
       float xx = -size / 2 + x*size / cols;
       float zz = -size / 2 + z*size / rows;
       // float yy = -1.0f;
@@ -341,14 +341,15 @@ int initGL()
 
 int main(int argc, char** argv)
 {
+    std::cout << "Starting... " << std::endl;
 	if(!glfwInit())
     return -1;
 
 	//запрашиваем контекст opengl версии 3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 
   GLFWwindow*  window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL basic sample", nullptr, nullptr);
@@ -358,19 +359,19 @@ int main(int argc, char** argv)
 		glfwTerminate();
 		return -1;
 	}
-	
-	glfwMakeContextCurrent(window); 
+
+	glfwMakeContextCurrent(window);
 
 	//регистрируем коллбеки для обработки сообщений от пользователя - клавиатура, мышь..
-	glfwSetKeyCallback        (window, OnKeyboardPressed);  
-	glfwSetCursorPosCallback  (window, OnMouseMove); 
+	glfwSetKeyCallback        (window, OnKeyboardPressed);
+	glfwSetCursorPosCallback  (window, OnMouseMove);
   glfwSetMouseButtonCallback(window, OnMouseButtonClicked);
 	glfwSetScrollCallback     (window, OnMouseScroll);
-	glfwSetInputMode          (window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+	glfwSetInputMode          (window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	if(initGL() != 0) 
+	if(initGL() != 0)
 		return -1;
-	
+
   //Reset any OpenGL errors which could be present for some reason
 	GLenum gl_error = glGetError();
 	while (gl_error != GL_NO_ERROR)
@@ -379,11 +380,11 @@ int main(int argc, char** argv)
 	//создание шейдерной программы из двух файлов с исходниками шейдеров
 	//используется класс-обертка ShaderProgram
 	std::unordered_map<GLenum, std::string> shaders;
-	shaders[GL_VERTEX_SHADER]   = "vertex.glsl";
-	shaders[GL_FRAGMENT_SHADER] = "fragment.glsl";
+	shaders[GL_VERTEX_SHADER]   = "./shaders/vertex.glsl";
+	shaders[GL_FRAGMENT_SHADER] = "./shaders/fragment.glsl";
 	ShaderProgram program(shaders); GL_CHECK_ERRORS;
 
-  
+
   //Создаем и загружаем геометрию поверхности
   GLuint vaoTriStrip;
   int triStripIndices = createTriStrip(100, 100, 40, vaoTriStrip);
@@ -416,7 +417,7 @@ int main(int argc, char** argv)
 
 		                //модельная матрица, определяющая положение объекта в мировом пространстве
 		float4x4 model; //начинаем с единичной матрицы
-		
+
     program.StartUseShader();
 
     //загружаем uniform-переменные в шейдерную программу (одинаковые для всех параллельно запускаемых копий шейдера)
@@ -431,7 +432,7 @@ int main(int argc, char** argv)
 
     program.StopUseShader();
 
-		glfwSwapBuffers(window); 
+		glfwSwapBuffers(window);
 	}
 
 	//очищаем vao перед закрытием программы
