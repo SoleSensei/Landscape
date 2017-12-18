@@ -10,8 +10,8 @@ const int m_cols = 200;
 const int terrain_size = 2*2*2*2*2*2*2*2+1; // terrain_size > min(rows,cols)  
 float map[terrain_size][terrain_size];
 const float roughness = 0.3;
-bool isRandom = true;
 const int map_const = 4000;
+bool isRandom = false;
 
 
 
