@@ -1,14 +1,17 @@
 #ifndef MAP_H
 #define MAP_H
+#include <iostream>
 
+using std::cerr;
+using std::endl;
 
 const int m_rows = 200;
 const int m_cols = 200;
-//  log2(std::max(m_rows, m_cols)) + 1;
-const int terrain_size = 2*2*2*2*2*2*2*2+1; // terrain_size < max(rows,cols)  
+const int terrain_size = 2*2*2*2*2*2*2*2+1; // terrain_size > min(rows,cols)  
 float map[terrain_size][terrain_size];
 const float roughness = 0.3;
 bool isRandom = true;
+const int map_const = 4000;
 
 
 

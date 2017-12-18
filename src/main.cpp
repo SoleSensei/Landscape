@@ -147,7 +147,7 @@ static int createTriStrip(int rows, int cols, float size, GLuint &vao)
 	std::vector<GLuint> indices_vec; //вектор индексов вершин для передачи шейдерной программе
 	indices_vec.reserve(numIndices);
 
-	diamond_square(size);
+	diamond_square(size); // алгоритм Diamond-Square 
 
 	for (int z = 0; z < rows; ++z)
 	{
