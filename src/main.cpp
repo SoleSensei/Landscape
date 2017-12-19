@@ -19,6 +19,7 @@ static GLfloat lastX = 400, lastY = 300; //исходное положение �
 static bool firstMouse = true;
 static bool g_captureMouse         = true;  // Мышка захвачена нашим приложением или нет?
 static bool g_capturedMouseJustNow = false;
+static int view_mode = 1;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -51,10 +52,13 @@ void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, in
 		}
 		break;
 	case GLFW_KEY_1:
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		view_mode = 1; // texture view
 		break;
 	case GLFW_KEY_2:
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		view_mode = 2; // normal view
+		break;
+	case GLFW_KEY_3:
+		view_mode = 3; // color view
 		break;
 	default:
 		if (action == GLFW_PRESS)
@@ -477,6 +481,7 @@ int main(int argc, char** argv)
 		program.SetUniform("view",       view);       GL_CHECK_ERRORS;
 		program.SetUniform("projection", projection); GL_CHECK_ERRORS;
 		program.SetUniform("model",      model);
+		program.SetUniform("mode",       view_mode);
 
 		//рисуем плоскость
 		glBindVertexArray(vaoTriStrip);

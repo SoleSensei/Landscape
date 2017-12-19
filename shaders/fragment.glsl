@@ -2,6 +2,7 @@
 in vec3 vFragPosition;
 in vec2 vTexCoords;
 in vec3 vNormal;
+uniform int mode;
 uniform sampler2D rock_tex; 
 uniform sampler2D sand_tex;
 uniform sampler2D aqua_tex;
@@ -51,7 +52,7 @@ void main()
     float kd = max(dot(vNormal, lightDir), 0.0);
 
     vec3 snow = vec3(0.8f, 0.8f, 0.8f);
-    vec3 sand = vec3(0.7f, 0.7f, 0.2f);
+    vec3 sand = vec3(0.6f, 0.6f, 0.3f);
     vec3 aqua = vec3(0.0f, 0.7f, 0.9f);
     vec3 rock = vec3(0.4f, 0.41f, 0.4f);
     vec3 tree = vec3(0.15f, 0.3f, 0.17f);
@@ -59,11 +60,8 @@ void main()
         col = aqua;
         tex = texture(aqua_tex, vTexCoords);
     }else if (vFragPosition.y <= 2){ // sand
-        col = sand;
+        col = smooth_color(0, aqua, sand);
         tex = smooth_tex(0, aqua_tex, sand_tex);
-        if (vFragPosition.y <= 0.3){
-            col = (aqua + sand)/2;
-        }        
     }else if (vFragPosition.y <= 15){ // tree
         col = smooth_color(2.0f, sand, tree);
         tex = smooth_tex(2.0f, sand_tex, rock_tex);
@@ -75,5 +73,10 @@ void main()
         tex = smooth_tex(25.0f, rock_tex, snow_tex);            
     }
 
-    color = mix(tex, vec4(kd * col, 1.0), 0.3); // tex + color
+    if (mode == 1)
+        color = mix(tex, vec4(kd * col, 1.0), 0.3); // tex + color
+    else if (mode == 2)
+        color =  vec4(abs(vNormal), 1.0f); // normals
+    else 
+        color = vec4(kd * col, 1.0); // color
 }
