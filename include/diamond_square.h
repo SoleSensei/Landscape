@@ -6,6 +6,7 @@
 #include <ctime>
 #include <algorithm>
 #include <assert.h>
+#include <climits>
 #include "landscape.h"
 
 void square_step(int x, int y, int step);
@@ -69,7 +70,7 @@ void diamond_step(int x, int y, int step) {
     float a,b,c;
     float random_range = -r * half + rand() % int(2*r*half + 1);
     float average;
-
+    
     a = map[x][y];
 
     b = map[x-half][y-half];
@@ -81,7 +82,7 @@ void diamond_step(int x, int y, int step) {
     average = (a + b + c) / 3;
     random_range = -r * half + rand() % int(2*r*half + 1);
     map[x][y-half] = average + random_range;
-
+    
     b = map[x+half][y+half];
     average = (a + b + c) / 3;
     random_range = -r * half + rand() % int(2*r*half + 1);
@@ -95,18 +96,26 @@ void diamond_step(int x, int y, int step) {
 
 void normalization(){
 
-    float sum2 = 0.0f;
+    float min = std::numeric_limits<float>::max();
+    float max = -min;
     for(uint x = 0; x < terrain_size; ++x)
         for(uint y = 0; y < terrain_size; ++y){
-            sum2 += map[x][y]*map[x][y];
+            min = map[x][y] < min ? map[x][y] : min;
+            max = map[x][y] > max ? map[x][y] : max;
         }
-    if (sum2 < 0.001f)
-        return;
-
-    float sum = sqrt(sum2) / map_const;
+    
     for(uint x = 0; x < terrain_size; ++x)
         for(uint y = 0; y < terrain_size; ++y){
-            map[x][y] = map[x][y] / sum;
+            map[x][y] = (map[x][y] - min) / (max-min);
+            map[x][y] = map[x][y]*map[x][y] - 0.2;
+        }
+
+    for(uint x = 0; x < terrain_size; ++x)
+        for(uint y = 0; y < terrain_size; ++y){
+            if (map[x][y] < 0.0f)
+                map[x][y] = 0.0f;
+            else 
+                map[x][y] = map[x][y]*map_height;
         }
 }
 
@@ -130,14 +139,13 @@ void avg_neighbor(int from_x, int from_y, uint size){
         }
     if (sum2 < 0.001f)
         return;
-    float sum = sqrt(sum2) / map_const;
+    float sum = sqrt(sum2);
     for(uint x = from_x; x < to_x; ++x)
         for(uint y = from_y; y < to_y; ++y){
             map[x][y] = map[x][y] / sum;
         }
 }
 
-int hist[map_const];
 void median(int radius){
     uint size = 2*radius+1;
     for(uint x = radius; x < terrain_size-radius; ++x)
@@ -148,9 +156,10 @@ void median(int radius){
 
 float median_filter(int from_x, int from_y, uint size){
     
+    int hist[map_height];
     uint to_x = from_x+size;
     uint to_y = from_y+size;
-    for (uint i = 0; i < map_const; ++i) hist[i] = 0;
+    for (uint i = 0; i < map_height; ++i) hist[i] = 0;
     
     for(uint x = from_x; x < to_x; ++x)
         for(uint y = from_y; y < to_y; ++y){
@@ -158,7 +167,7 @@ float median_filter(int from_x, int from_y, uint size){
             hist[val]++;
         }
     int sum = 0; int r = 0;
-    for(uint i = 0; i < map_const; ++i){
+    for(uint i = 0; i < map_height; ++i){
         sum += hist[i];
         if (sum > size*size / 2){ //found median
             r = i;

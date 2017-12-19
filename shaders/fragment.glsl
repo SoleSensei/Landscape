@@ -76,7 +76,7 @@ void main()
     if (mode == 1)
         color = mix(tex, vec4(kd * col, 1.0), 0.3); // tex + color
     else if (mode == 2)
-        color =  vec4(abs(vNormal), 1.0f); // normals
+        color =  mix(vec4(abs(vNormal), 1.0f), vec4(kd * col, 1.0), 0.2); // normals + col
     else 
         color = vec4(kd * col, 1.0); // color
 }

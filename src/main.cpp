@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "diamond_square.h"
 #include "landscape.h"
+#include "skybox.h"
 #include "SOIL/SOIL.h"
 
 
@@ -391,6 +392,10 @@ int main(int argc, char** argv)
 	shaders[GL_VERTEX_SHADER]   = "../shaders/vertex.glsl";
 	shaders[GL_FRAGMENT_SHADER] = "../shaders/fragment.glsl";
 	ShaderProgram program(shaders); GL_CHECK_ERRORS;
+	shaders[GL_VERTEX_SHADER] = "../shaders/skybox_vertex.glsl";
+	shaders[GL_FRAGMENT_SHADER] = "../shaders/skybox_fragment.glsl";
+	ShaderProgram skyboxshader(shaders); GL_CHECK_ERRORS;
+	
 
 
 	//Создаем и загружаем геометрию поверхности
@@ -404,6 +409,7 @@ int main(int argc, char** argv)
 	
 	// массивы идендификаторов текстур
 	GLuint rock_tex, sand_tex, aqua_tex, snow_tex;
+
 	/**** rock ****/
 	// создаем идендификаторы  
 	glGenTextures(1, &rock_tex);
@@ -420,12 +426,13 @@ int main(int argc, char** argv)
 	SOIL_free_image_data(image);
 	// отвязка объекта текстуры
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 	/**** sand ****/	
 	glGenTextures(1, &sand_tex);
 	// активируем текстурный блок
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, sand_tex);
-	image = SOIL_load_image("../textures/sand3.png", &width, &height, 0, SOIL_LOAD_RGB);
+	image = SOIL_load_image("../textures/sand1.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
@@ -451,6 +458,8 @@ int main(int argc, char** argv)
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+
+	SkyBox skybox(terrain_size, "1");
 	//цикл обработки сообщений и отрисовки сцены каждый кадр
 	while (!glfwWindowShouldClose(window))
 	{
@@ -504,6 +513,9 @@ int main(int argc, char** argv)
 		
 		glDrawElements(GL_TRIANGLE_STRIP, triStripIndices, GL_UNSIGNED_INT, nullptr); GL_CHECK_ERRORS;
 		glBindVertexArray(0); GL_CHECK_ERRORS;
+
+		// рисуем skybox
+		skybox.Draw(skyboxshader, projection, view, camera.pos);
 
 		program.StopUseShader();
 
