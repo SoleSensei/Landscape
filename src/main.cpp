@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "diamond_square.h"
 #include "landscape.h"
+#include "SOIL/SOIL.h"
+
 
 //External dependencies
 #define GLFW_DLL
@@ -382,8 +384,8 @@ int main(int argc, char** argv)
 	//создание шейдерной программы из двух файлов с исходниками шейдеров
 	//используется класс-обертка ShaderProgram
 	std::unordered_map<GLenum, std::string> shaders;
-	shaders[GL_VERTEX_SHADER]   = "vertex.glsl";
-	shaders[GL_FRAGMENT_SHADER] = "fragment.glsl";
+	shaders[GL_VERTEX_SHADER]   = "../shaders/vertex.glsl";
+	shaders[GL_FRAGMENT_SHADER] = "../shaders/fragment.glsl";
 	ShaderProgram program(shaders); GL_CHECK_ERRORS;
 
 
@@ -395,6 +397,55 @@ int main(int argc, char** argv)
 	glViewport(0, 0, WIDTH, HEIGHT);  GL_CHECK_ERRORS;
 	glEnable(GL_DEPTH_TEST);  GL_CHECK_ERRORS;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	// массивы идендификаторов текстур
+	GLuint rock_tex, sand_tex, aqua_tex, snow_tex;
+	/**** rock ****/
+	// создаем идендификаторы  
+	glGenTextures(1, &rock_tex);
+	// привязка текстуры (для работы с ней)
+	glBindTexture(GL_TEXTURE_2D, rock_tex);
+	// загрузка изображения текстуры .png через SOIL
+	int width, height;
+	unsigned char* image = SOIL_load_image("../textures/rock.png", &width, &height, 0, SOIL_LOAD_RGB);
+	// генерация тексутры из изображения
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	// генерация мипмапов
+	glGenerateMipmap(GL_TEXTURE_2D);
+	// освобождение память от загруженного сообщения
+	SOIL_free_image_data(image);
+	// отвязка объекта текстуры
+	glBindTexture(GL_TEXTURE_2D, 0);
+	/**** sand ****/	
+	glGenTextures(1, &sand_tex);
+	// активируем текстурный блок
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, sand_tex);
+	image = SOIL_load_image("../textures/sand3.png", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	/**** aqua ****/	
+	glGenTextures(1, &aqua_tex);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, aqua_tex);
+	image = SOIL_load_image("../textures/aqua1.png", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+		/**** snow ****/	
+	glGenTextures(1, &snow_tex);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, snow_tex);
+	image = SOIL_load_image("../textures/snow2.png", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//цикл обработки сообщений и отрисовки сцены каждый кадр
 	while (!glfwWindowShouldClose(window))
@@ -429,6 +480,23 @@ int main(int argc, char** argv)
 
 		//рисуем плоскость
 		glBindVertexArray(vaoTriStrip);
+		// текстурирование
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, rock_tex);
+		program.SetUniform("rock_tex", 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, sand_tex);
+		program.SetUniform("sand_tex", 1);
+		
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, aqua_tex);
+		program.SetUniform("aqua_tex", 2);
+
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, snow_tex);
+		program.SetUniform("snow_tex", 3);
+		
 		glDrawElements(GL_TRIANGLE_STRIP, triStripIndices, GL_UNSIGNED_INT, nullptr); GL_CHECK_ERRORS;
 		glBindVertexArray(0); GL_CHECK_ERRORS;
 
