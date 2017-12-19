@@ -21,7 +21,24 @@ vec3 smooth_color(in float border, in vec3 prev_col, in vec3 cur_col)
         col = (p*cur_col+(200-p)*prev_col) / 200;
     else
         col = ((100+p)*cur_col+(100-p)*prev_col) / 200;
+
     return col;
+}
+
+vec4 smooth_tex(in float border, in sampler2D prev_tex, in sampler2D cur_tex)
+{
+    float h = vFragPosition.y;    
+    if (h >= border + 2.0f)
+        return texture(cur_tex, vTexCoords);
+    
+    float p = int(h * 100) % 100;
+    vec4 tex;
+    if (h < border + 1.0f)
+        tex = mix(texture(prev_tex,vTexCoords), texture(cur_tex,vTexCoords), p/200);
+    else
+        tex = mix(texture(prev_tex,vTexCoords), texture(cur_tex,vTexCoords), 0.5+p/200);
+
+    return tex;   
 }
 
 void main()
@@ -41,22 +58,21 @@ void main()
     if (vFragPosition.y <= 0){ // aqua
         col = aqua;
         tex = texture(aqua_tex, vTexCoords);
-    }else if (vFragPosition.y <= 1){ // sand
+    }else if (vFragPosition.y <= 2){ // sand
         col = sand;
-        tex = texture(sand_tex, vTexCoords);        
+        tex = smooth_tex(0, aqua_tex, sand_tex);
         if (vFragPosition.y <= 0.3){
             col = (aqua + sand)/2;
-            tex = texture(aqua_tex, vTexCoords);
         }        
     }else if (vFragPosition.y <= 15){ // tree
-        col = smooth_color(1.0f, sand, tree);
-        tex = texture(rock_tex, vTexCoords);
+        col = smooth_color(2.0f, sand, tree);
+        tex = smooth_tex(2.0f, sand_tex, rock_tex);
     }else if (vFragPosition.y <= 25){ // rock
         col = smooth_color(15.0f, tree, rock);
         tex = texture(rock_tex, vTexCoords);        
     }else{ // snow
         col = smooth_color(25.0f, rock, snow);
-        tex = mix(texture(snow_tex, vTexCoords),texture(rock_tex, vTexCoords), 0.5);            
+        tex = smooth_tex(25.0f, rock_tex, snow_tex);            
     }
 
     color = mix(tex, vec4(kd * col, 1.0), 0.3); // tex + color
