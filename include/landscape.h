@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 #include <iostream>
+#include <string>
 
 using std::cerr;
 using std::endl;
@@ -12,6 +13,7 @@ float map[terrain_size][terrain_size];
 const float roughness = 0.3;
 const int map_height = 85;
 bool isRandom = true;
+const std::string pick_sky = "4";  // 1-4
 
 
 

@@ -24,12 +24,13 @@ class SkyBox{
         for (unsigned int i = 0; i < faces.size(); i++)
         {
             string file = path + faces[i];
-            unsigned char* data = SOIL_load_image(file.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+            cerr << file << endl;
+            GLubyte* data = SOIL_load_image(file.c_str(), &width, &height, &nrChannels, SOIL_LOAD_AUTO);
             if (data)
             {
                 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
                             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-                );
+                ); 
             	// glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	            SOIL_free_image_data(data);
                 // glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -76,12 +77,12 @@ class SkyBox{
         };  
         vector<string> faces
         {
-            "right.jpg",
-            "left.jpg",
-            "top.jpg",
-            "bottom.jpg",
-            "back.jpg",
-            "front.jpg"
+            "right.tga",
+            "left.tga",
+            "top.tga",
+            "bottom.tga",
+            "back.tga",
+            "front.tga"
         };
 	    glGenVertexArrays(1, &vao);
 	    glGenBuffers(1, &VBOvertices);

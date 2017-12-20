@@ -459,7 +459,7 @@ int main(int argc, char** argv)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 
-	SkyBox skybox(terrain_size, "1");
+	SkyBox skybox(terrain_size, pick_sky);
 	//цикл обработки сообщений и отрисовки сцены каждый кадр
 	while (!glfwWindowShouldClose(window))
 	{
