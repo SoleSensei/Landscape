@@ -107,7 +107,7 @@ void normalization(){
     for(uint x = 0; x < terrain_size; ++x)
         for(uint y = 0; y < terrain_size; ++y){
             map[x][y] = (map[x][y] - min) / (max-min);
-            map[x][y] = map[x][y]*map[x][y] - 0.2;
+            map[x][y] = map[x][y]*map[x][y] - 0.2f;
         }
 
     for(uint x = 0; x < terrain_size; ++x)
