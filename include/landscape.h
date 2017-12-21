@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+/**** лучше не трогать ****/
 using std::cerr;
 using std::endl;
 const int m_rows = 200;
