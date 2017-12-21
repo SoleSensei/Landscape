@@ -52,7 +52,7 @@ vec4 smooth_tex(in float border, in sampler2D prev_tex, in sampler2D cur_tex)
 
 float fog_init() // fog setting up
 {
-    float fog_cord = (gl_FragCoord.z/gl_FragCoord.w)/1000.0f;
+    float fog_cord = (gl_FragCoord.z/gl_FragCoord.w)/700.0f;
     float fog_destiny = 6.0;
     float fog = fog_cord * fog_destiny;
     
@@ -65,7 +65,7 @@ void main()
 
     vec3 col = vec3(0.0f, 0.9f, 0.75f);
     vec4 tex = texture(aqua_tex, vTexCoords);
-    vec4 fog_color = vec4(1,1,1,0);
+    vec4 fog_col = vec4(1,1,1,1);
 
     float kd = max(dot(vNormal, lightDir), 0.0);
     float alpha = fog_init(); // alpha mixing with fog
@@ -77,12 +77,12 @@ void main()
     vec3 tree = vec3(0.15f, 0.3f, 0.17f);
 
     // color picker
-    if (vFragPosition.y <= 0){ // aqua
-        col = aqua;
-        tex = texture(aqua_tex, vTexCoords);
-    }else if (vFragPosition.y <= 2){ // sand
-        col = smooth_color(0, aqua, sand);
-        tex = smooth_tex(0, aqua_tex, sand_tex);
+    // if (vFragPosition.y <= 0){ // aqua
+        // col = sand;
+        // tex = texture(sand_tex, vTexCoords);
+    if (vFragPosition.y <= 2){ // sand
+        col = smooth_color(0, sand, sand);
+        tex = smooth_tex(0, sand_tex, sand_tex);
     }else if (vFragPosition.y <= 15){ // tree
         col = smooth_color(2.0f, sand, tree);
         tex = smooth_tex(2.0f, sand_tex, rock_tex);
@@ -103,5 +103,5 @@ void main()
         color = vec4(kd * col, 1.0); // color
 
 
-    out_color = mix(color, fog_color, alpha); // +fog
+    out_color = mix(color, fog_col, alpha); // +fog
 }

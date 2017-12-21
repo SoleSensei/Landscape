@@ -44,7 +44,8 @@ void diamond_square(const int size){
     }
     normalization();
     // averaging(1);
-    median(1);
+    if (isMedian)
+        median(1);
 }
 
 void square_step(int x, int y, int step) {
@@ -112,10 +113,10 @@ void normalization(){
 
     for(uint x = 0; x < terrain_size; ++x)
         for(uint y = 0; y < terrain_size; ++y){
-            if (map[x][y] < 0.0f)
+            if (isMedian && map[x][y] < 0.0f)
                 map[x][y] = 0.0f;
             else 
-                map[x][y] = map[x][y]*map_height;
+            map[x][y] = map[x][y]*map_height;
         }
 }
 

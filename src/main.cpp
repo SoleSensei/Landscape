@@ -3,9 +3,10 @@
 #include "ShaderProgram.h"
 #include "Camera.h"
 #include "diamond_square.h"
-#include "landscape.h"
-#include "skybox.h"
+#include "landscape.h" // setting up
 #include "SOIL/SOIL.h"
+#include "skybox.h"
+#include "seaplane.h"
 
 
 //External dependencies
@@ -24,6 +25,7 @@ static int view_mode = 1;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+GLfloat sea_time = 0.0f;
 
 Camera camera(float3(0.0f, 40.0f, 30.0f));
 
@@ -395,11 +397,14 @@ int main(int argc, char** argv)
 	shaders[GL_VERTEX_SHADER] = "../shaders/skybox_vertex.glsl";
 	shaders[GL_FRAGMENT_SHADER] = "../shaders/skybox_fragment.glsl";
 	ShaderProgram skyboxshader(shaders); GL_CHECK_ERRORS;
+	shaders[GL_VERTEX_SHADER] = "../shaders/sea_vertex.glsl";
+	shaders[GL_FRAGMENT_SHADER] = "../shaders/sea_fragment.glsl";
+	ShaderProgram seashader(shaders); GL_CHECK_ERRORS;
 	
 
 
 	//Создаем и загружаем геометрию поверхности
-	GLuint vaoTriStrip;
+	GLuint vaoTriStrip, sea_vao;
 	int triStripIndices = createTriStrip(m_rows, m_cols, terrain_size, vaoTriStrip);
 
 
@@ -458,16 +463,24 @@ int main(int argc, char** argv)
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
+	SeaPlane sea(terrain_size);
+	GLuint sea_tex = sea.load_texture();
 	SkyBox skybox(terrain_size, pick_sky);
 	//цикл обработки сообщений и отрисовки сцены каждый кадр
+	glEnable(GL_BLEND); // прозрачность
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	int n = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		//считаем сколько времени прошло за кадр
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
+		glfwPollEvents();
+		doCameraMovement(camera, deltaTime);
+		if (n++ % 3 == 0)
+			int sea_indices = sea.createSea(m_rows, m_cols, terrain_size, sea_vao);
+		if (n==300) n = 1;
 		glfwPollEvents();
 		doCameraMovement(camera, deltaTime);
 
@@ -516,6 +529,7 @@ int main(int argc, char** argv)
 
 		// рисуем skybox
 		skybox.Draw(skyboxshader, projection, view, camera.pos);
+		sea.Draw(seashader, projection, view, model, view_mode);
 
 		program.StopUseShader();
 
