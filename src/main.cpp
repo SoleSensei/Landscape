@@ -469,7 +469,7 @@ int main(int argc, char** argv)
 	//цикл обработки сообщений и отрисовки сцены каждый кадр
 	glEnable(GL_BLEND); // прозрачность
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	int n = 0;
+	int n = frame;
 	while (!glfwWindowShouldClose(window))
 	{
 		//считаем сколько времени прошло за кадр
@@ -478,9 +478,10 @@ int main(int argc, char** argv)
 		lastFrame = currentFrame;
 		glfwPollEvents();
 		doCameraMovement(camera, deltaTime);
-		if (n++ % 3 == 0)
+		if (n++ % frame == 0)
 			int sea_indices = sea.createSea(m_rows, m_cols, terrain_size, sea_vao);
-		if (n==300) n = 1;
+		if (n==frame*100) n = 1;
+		
 		glfwPollEvents();
 		doCameraMovement(camera, deltaTime);
 
